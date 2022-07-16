@@ -9,6 +9,7 @@ const app = express();
 
 // Tell the app to use ejs
 app.set("view engine", "ejs");
+app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 
 // Use get method to send repsonse 
@@ -18,16 +19,31 @@ let today = new Date();
 let options = { weekday: "long", month:"long", day:"numeric", year:"numeric"};
 let day = today.toLocaleDateString("en-GB", options);
 let items = ["Buy Food", "Cook Food", "Eat Food"];
+let workItems = [];
+let newListItem = "";
 
 
 app.get("/", function(req, res){
-    res.render("list", {dayOfTheWeek:day, listItem:items});
+    res.render("list", {listTitle:day, listItem:items});
+});
+
+app.get("/work", function(req, res){
+    res.render("list", {listTitle: "Work", listItem:workItems});
 });
 
 app.post("/", function(req, res){
-    let newListItem = req.body.newListItem;
-    items.push(newListItem)
-    res.redirect("/");
+    console.log(req.body);
+
+    if(req.body.list === "Work"){
+        newListItem = req.body.newListItem;
+        workItems.push(newListItem);
+        res.redirect("/work");
+    } else{
+        newListItem = req.body.newListItem;
+        items.push(newListItem)
+        res.redirect("/");
+    }
+    
     //res.send(newListItem);
 });
 
